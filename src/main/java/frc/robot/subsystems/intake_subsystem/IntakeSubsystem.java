@@ -2,14 +2,67 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.subsystems;
+package frc.robot.subsystems.intake_subsystem;
 
+import com.revrobotics.CANSparkMax;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.constants.intake_constants.IntakePivotConstants;
+import com.revrobotics.RelativeEncoder;
+import com.revrobotics.CANSparkLowLevel.MotorType;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-public class ExampleSubsystem extends SubsystemBase {
-  /** Creates a new ExampleSubsystem. */
-  public ExampleSubsystem() {}
+
+public class IntakeSubsystem extends SubsystemBase implements IIntake {
+
+  private static IntakeSubsystem intakeInstance = null;
+
+  RelativeEncoder relativeEncoder;
+  CANSparkMax intakePivot = new CANSparkMax(1, MotorType.kBrushless);
+  CANSparkMax intakeFlyWheel = new CANSparkMax(0, MotorType.kBrushless);
+
+  final double P = IntakePivotConstants.P;
+  final double I = IntakePivotConstants.I;
+  final double D = IntakePivotConstants.D;
+    
+  PIDController pidIntakePivot = new PIDController(this.P, this.I, this.D);
+
+  public IntakeSubsystem() {}
+
+  @Override
+    public double setIntakePivotEncoderConversionFactor(){
+        relativeEncoder = intakePivot.getEncoder();
+        relativeEncoder.setPositionConversionFactor((1/113.142857)*(360));
+        return relativeEncoder.getPosition();
+    }
+
+  @Override
+    public boolean intakePivotAtPosition(){
+      if(pidIntakePivot.atSetpoint()){
+        return true;
+      }
+      else {
+        return false;
+      }
+    }
+
+  @Override
+    public void setIntakePivotPosition(double setIntakePivotPoint){
+        pidIntakePivot.calculate(setIntakePivotEncoderConversionFactor(), setIntakePivotPoint);
+    }
+
+  @Override
+    public void runIntakeFlyWheels(double intakeFlyWheelPower){
+        intakeFlyWheel.set(intakeFlyWheelPower);
+    }
+
+  public static IntakeSubsystem getInstance(){
+    if (intakeInstance == null){
+      intakeInstance = new IntakeSubsystem();
+    }
+    return intakeInstance;
+  }
 
   /**
    * Example command factory method.
@@ -37,7 +90,7 @@ public class ExampleSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    // This method will be called once per scheduler run
+    SmartDashboard.putNumber("Encoder Intake Pivot", setIntakePivotEncoderConversionFactor());
   }
 
   @Override
