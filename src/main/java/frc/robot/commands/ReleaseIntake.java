@@ -9,11 +9,10 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.RobotSubsystems;
 
 public class ReleaseIntake extends Command {
-  private final RobotSubsystems robot;
-  double setIntakePivotPoint;
+  private RobotSubsystems robot;
+  double setIntakePivotPoint = 40;
 
-  public ReleaseIntake(RobotSubsystems robot, double setIntakePivotPoint) {
-    this.setIntakePivotPoint = setIntakePivotPoint;
+  public ReleaseIntake(RobotSubsystems robot) {
     this.robot = robot;
     addRequirements(robot.intakeSubsystem);
   }
