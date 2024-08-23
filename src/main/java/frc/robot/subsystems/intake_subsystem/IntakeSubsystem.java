@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.intake_constants.IntakePivotConstants;
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.SparkPIDController;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -26,20 +27,29 @@ public class IntakeSubsystem extends SubsystemBase implements IIntake {
   final double I = IntakePivotConstants.I;
   final double D = IntakePivotConstants.D;
     
-  PIDController pidIntakePivot = new PIDController(this.P, this.I, this.D);
+  SparkPIDController pidIntakePivot;
 
-  public IntakeSubsystem() {}
+  double maxVoltage = 0.1;
+  double minVoltage = -0.1;
+
+  double setIntakePivotPoint;
+
+  public IntakeSubsystem() {
+    relativeEncoder.setPosition(0);
+    pidIntakePivot.setP(this.P);
+    pidIntakePivot.setI(this.I);
+    pidIntakePivot.setD(this.D);
+  }
 
   @Override
-    public double setIntakePivotEncoderConversionFactor(){
-        relativeEncoder = intakePivot.getEncoder();
-        relativeEncoder.setPositionConversionFactor((1/113.142857)*(360));
-        return relativeEncoder.getPosition();
+    public void setIntakePivotEncoderConversionFactor(){
+        relativeEncoder = intakePivot.getAlternateEncoder(8192);
+        relativeEncoder.setPositionConversionFactor(360);
     }
 
   @Override
     public boolean intakePivotAtPosition(){
-      if(pidIntakePivot.atSetpoint()){
+      if(relativeEncoder.getPosition() == this.setIntakePivotPoint){
         return true;
       }
       else {
@@ -49,7 +59,8 @@ public class IntakeSubsystem extends SubsystemBase implements IIntake {
 
   @Override
     public void setIntakePivotPosition(double setIntakePivotPoint){
-        pidIntakePivot.calculate(setIntakePivotEncoderConversionFactor(), setIntakePivotPoint);
+      this.setIntakePivotPoint = setIntakePivotPoint;
+      pidIntakePivot.setReference(setIntakePivotPoint, CANSparkMax.ControlType.kPosition);
     }
 
   @Override
