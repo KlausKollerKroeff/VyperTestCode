@@ -5,7 +5,6 @@
 package frc.robot.subsystems.intake_subsystem;
 
 import com.revrobotics.CANSparkMax;
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.intake_constants.IntakePivotConstants;
@@ -20,8 +19,8 @@ public class IntakeSubsystem extends SubsystemBase implements IIntake {
   private static IntakeSubsystem intakeInstance = null;
 
   RelativeEncoder relativeEncoder;
-  CANSparkMax intakePivot = new CANSparkMax(1, MotorType.kBrushless);
-  CANSparkMax intakeFlyWheel = new CANSparkMax(0, MotorType.kBrushless);
+  CANSparkMax intakePivot = new CANSparkMax(9, MotorType.kBrushless);
+  CANSparkMax intakeFlyWheel = new CANSparkMax(12, MotorType.kBrushless);
 
   final double P = IntakePivotConstants.P;
   final double I = IntakePivotConstants.I;
@@ -35,7 +34,6 @@ public class IntakeSubsystem extends SubsystemBase implements IIntake {
   double setIntakePivotPoint;
 
   public IntakeSubsystem() {
-    relativeEncoder.setPosition(0);
     pidIntakePivot.setP(this.P);
     pidIntakePivot.setI(this.I);
     pidIntakePivot.setD(this.D);
@@ -101,7 +99,7 @@ public class IntakeSubsystem extends SubsystemBase implements IIntake {
 
   @Override
   public void periodic() {
-    SmartDashboard.putNumber("Encoder Intake Pivot", setIntakePivotEncoderConversionFactor());
+    SmartDashboard.putNumber("Encoder Intake Pivot", relativeEncoder.getPosition());
   }
 
   @Override

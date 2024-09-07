@@ -10,12 +10,11 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 public class RobotContainer {
-  RobotSubsystems robot;
+  RobotSubsystems robot = new RobotSubsystems();
   ReleaseIntake releaseIntake = new ReleaseIntake(this.robot);
   SecuredPosition securedIntakePosition = new SecuredPosition(this.robot);
 
   private final CommandXboxController xboxController = new CommandXboxController(0);
-
 
   public RobotContainer() {
     configureBindings();
