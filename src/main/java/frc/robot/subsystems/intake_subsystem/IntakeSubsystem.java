@@ -34,6 +34,7 @@ public class IntakeSubsystem extends SubsystemBase implements IIntake {
   double setIntakePivotPoint;
 
   public IntakeSubsystem() {
+    pidIntakePivot = intakePivot.getPIDController();
     pidIntakePivot.setP(this.P);
     pidIntakePivot.setI(this.I);
     pidIntakePivot.setD(this.D);
